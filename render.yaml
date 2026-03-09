@@ -1,11 +1,12 @@
 services:
   - type: web
-    name: helmate-server
+    name: helmate
     env: docker
     plan: free
-    region: ohio
+    region: singapore
     branch: main
     dockerFilePath: ./Dockerfile
+    healthCheckPath: /
     envVars:
       - key: PORT
         value: "5001"
@@ -13,7 +14,3 @@ services:
         value: "1"
       - key: PYTHONUNBUFFERED
         value: "1"
-    disk:
-      name: database-disk
-      mountPath: /app/database
-      sizeGB: 1
