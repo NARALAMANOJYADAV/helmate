@@ -233,6 +233,15 @@ async function startCamera(facingMode = 'environment') {
         }
 
         let statusHtml = `<i class="fas fa-circle" style="color: #ef4444; font-size: 0.7rem;"></i> ERROR: ${errorMsg}`;
+        
+        // Add helpful guide for Access Denied
+        if (err.name === 'NotAllowedError' || errorMsg.includes("denied")) {
+            statusHtml += `<div style="font-size: 0.75rem; margin-top: 5px; color: #fca5a5;">
+                Tip: Click the <b>Lock icon (🔒)</b> in address bar -> Site Settings -> Allow Camera 
+                <br>Then Refresh the page.
+            </div>`;
+        }
+
         if (suggestServer) {
             statusHtml += ` <button onclick="useServerFeed()" style="margin-left:10px; padding:2px 8px; font-size:0.7rem; background:#3b82f6; color:white; border:none; border-radius:4px; cursor:pointer;">Try Server Camera</button>`;
         }
