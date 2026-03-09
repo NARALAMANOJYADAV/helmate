@@ -164,17 +164,17 @@ def serve_image(filename):
 
 
 def gen_frames():
-    # SIMULATION MODE: Use this to prevent camera crashes
-    USE_REAL_CAMERA = True 
+    # SIMULATION MODE: Default to True on Cloud servers (no physical camera)
+    USE_REAL_CAMERA = os.environ.get("RENDER") is None
     
     cap = None
     if USE_REAL_CAMERA:
-        print("[AI] Initializing Camera (CAP_DSHOW for Windows stability)...", flush=True)
-        # Try CAP_DSHOW first for Windows stability
+        print("[AI] Cloud Check: Enabling Physical Camera search...", flush=True)
         cap = cv2.VideoCapture(0, cv2.CAP_DSHOW)
         if not cap.isOpened():
-            print("[AI] CAP_DSHOW failed, trying default backend...", flush=True)
             cap = cv2.VideoCapture(0)
+    else:
+        print("[AI] Cloud Environment Detected: Physical Camera disabled. Please use Browser Camera.", flush=True)
     
     if not USE_REAL_CAMERA or (cap is None or not cap.isOpened()):
         print("[AI] Entering Simulation Mode (No Camera Found)", flush=True)
@@ -226,21 +226,23 @@ def video_feed():
 def camera_status():
     """Check if camera is available and properly initialized"""
     try:
-        cap = None
+        # Skip physical check if on Render to avoid log spam
+        if os.environ.get("RENDER"):
+            return jsonify({
+                "camera_available": False,
+                "opencv_available": cv2 is not None,
+                "server_status": "online",
+                "message": "Render Cloud: Use 'Start Camera' button for Browser Access"
+            })
+
         camera_available = False
-        
+        cap = None
         if cv2 is not None:
             # Try to open camera with different backends
             try:
-                cap = cv2.VideoCapture(0, cv2.CAP_DSHOW)
-                if cap.isOpened():
-                    camera_available = True
-                else:
-                    # Try default backend
-                    cap = cv2.VideoCapture(0)
-                    camera_available = cap.isOpened()
+                cap = cv2.VideoCapture(0)
+                camera_available = cap.isOpened()
             except Exception as e:
-                print(f"Camera check error: {e}")
                 camera_available = False
         
         if cap is not None:
