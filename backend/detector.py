@@ -158,6 +158,11 @@ class HelmetDetector:
                         persons.append(scaled_b)
                     elif cls in [3, 1, 2]: # Motorcycle, Bicycle, Car
                         motorcycles.append(scaled_b)
+                
+                if motorcycles:
+                    print(f"[AI] Detected {len(motorcycles)} motorcycle(s)", flush=True)
+                if persons:
+                    print(f"[AI] Detected {len(persons)} person(s)", flush=True)
             
             # --- ADVANCED RIDER FILTERING ---
             # We only care about people ON or NEAR a vehicle
@@ -203,10 +208,10 @@ class HelmetDetector:
             
             for p in riders_to_check:
                 box_h = p[3] - p[1]
-                # DISTANCE FILTER: Focus only on people close to the camera (Main User)
-                if box_h < (img_h * 0.40): 
+                # DISTANCE FILTER: More sensitive threshold for testing (15% height)
+                if box_h < (img_h * 0.15): 
                     cv2.rectangle(frame, (p[0], p[1]), (p[2], p[3]), (100, 100, 100), 1)
-                    cv2.putText(frame, "BACKGROUND", (p[0], p[1]-5), cv2.FONT_HERSHEY_PLAIN, 0.7, (100, 100, 100), 1)
+                    cv2.putText(frame, "DISTANT", (p[0], p[1]-5), cv2.FONT_HERSHEY_PLAIN, 0.7, (100, 100, 100), 1)
                     continue
                 
                 # MARGIN FILTER: Ignore people entering from the sides
@@ -250,6 +255,7 @@ class HelmetDetector:
             # 3. CAPTURE CONTROL
             if violation_found:
                 if (now - self.last_detection_time > self.detection_interval):
+                    print(f"[AI] VIOLATION DETECTED: {violation_reason}. Capturing image...", flush=True)
                     cv2.putText(frame, f"VIOLATION: {violation_reason}", (20, 50), cv2.FONT_HERSHEY_PLAIN, 2, NEON_RED, 2)
                     self.handle_violation(frame)
                     self.last_detection_time = now
