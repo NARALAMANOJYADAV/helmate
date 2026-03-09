@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - Helmet AI System</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background: var(--primary-bg);
+            margin: 0;
+        }
+
+        .login-card {
+            width: 100%;
+            max-width: 400px;
+            padding: 40px;
+            background: var(--secondary-bg);
+            border-radius: 20px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+            text-align: center;
+        }
+
+        .login-card h2 {
+            margin-bottom: 30px;
+            color: var(--accent-color);
+        }
+
+        /* Error message styling */
+        .error-msg {
+            background: rgba(239, 68, 68, 0.1);
+            color: #ef4444;
+            padding: 10px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            font-size: 0.9rem;
+            border: 1px solid rgba(239, 68, 68, 0.2);
+            display: none;
+            /* Hidden by default */
+        }
+
+        /* This class is applied when an error is present */
+        .show-error {
+            display: block !important;
+        }
+
+        .input-group {
+            margin-bottom: 20px;
+            text-align: left;
+        }
+
+        .input-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: var(--text-muted);
+            font-size: 0.9rem;
+        }
+
+        .input-group input {
+            width: 100%;
+            padding: 12px;
+            border-radius: 10px;
+            border: 1px solid var(--sidebar-bg);
+            background: var(--primary-bg);
+            color: var(--text-main);
+            outline: none;
+        }
+
+        .login-btn {
+            width: 100%;
+            padding: 12px;
+            border: none;
+            border-radius: 10px;
+            background: var(--accent-color);
+            color: white;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .login-btn:hover {
+            opacity: 0.9;
+            transform: translateY(-2px);
+        }
+    </style>
+</head>
+
+<body>
+    <div class="login-card">
+        <h2>Admin Login</h2>
+
+        <!-- Updated Error Section: No visible curly braces unless served by Flask -->
+        <div id="errorBox" class="error-msg">
+            {{ error }}
+        </div>
+
+        <form action="/login" method="POST">
+
+            <div class="input-group">
+                <label>Administration ID</label>
+                <input type="text" name="username" placeholder="Username" required autocomplete="username">
+            </div>
+            <div class="input-group">
+                <label>Password</label>
+                <input type="password" name="password" placeholder="Password" required autocomplete="current-password">
+            </div>
+            <button type="submit" class="login-btn">Login</button>
+        </form>
+
+        <p style="margin-top:20px; font-size: 0.8rem; color: var(--text-muted);">
+            ID: MANOJ | Pass: manoj@64
+        </p>
+    </div>
+
+    <script src="sync.js"></script>
+    <script>
+        // Minimal script to hide the Jinja2 tag string if it hasn't been parsed by Flask
+        const errorBox = document.getElementById('errorBox');
+        if (errorBox) {
+            const content = errorBox.innerHTML.trim();
+            if (content && content !== '{{ error }}' && content.length > 0) {
+                errorBox.classList.add('show-error');
+            }
+        }
+    </script>
+</body>
+
+</html>

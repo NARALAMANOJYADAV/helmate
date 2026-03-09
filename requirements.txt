@@ -1,0 +1,8 @@
+flask
+opencv-python-headless
+ultralytics
+gunicorn
+numpy
+pillow
+# pytesseract # Required for OCR if using tesseract
+# easyocr # Alternative OCR

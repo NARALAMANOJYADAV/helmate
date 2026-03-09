@@ -1,0 +1,30 @@
+app = "helmate"
+primary_region = "sin"
+
+[build]
+  dockerfile = "Dockerfile"
+
+[env]
+  PORT = "5001"
+  PYTHONDONTWRITEBYTECODE = "1"
+  PYTHONUNBUFFERED = "1"
+
+[http_service]
+  internal_port = 5001
+  force_https = true
+  auto_stop_machines = true
+  auto_start_machines = true
+  min_machines_running = 0
+  processes = ["app"]
+
+[[http_service.checks]]
+  interval = "15s"
+  timeout = "5s"
+  grace_period = "10s"
+  method = "get"
+  path = "/"
+
+[[vm]]
+  memory = "1gb"
+  cpu_kind = "shared"
+  cpus = 1

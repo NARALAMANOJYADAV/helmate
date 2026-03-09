@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Statistics - Helmet AI</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    <script src="sync.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
+</head>
+
+<body>
+    <div class="dashboard">
+        <aside class="sidebar">
+            <h2><i class="fas fa-shield-alt"></i> Helmet AI</h2>
+            <ul>
+                <li><a href="dash-home.html"><i class="fas fa-video"></i> Live Camera</a></li>
+                <li><a href="dashboard.html"><i class="fas fa-exclamation-triangle"></i> Violations</a></li>
+                <li><a href="graph.html" class="active"><i class="fas fa-chart-line"></i> Statistics</a></li>
+                <li><a href="location.html"><i class="fas fa-map-marker-alt"></i> Locations</a></li>
+                <li><a href="messages.html"><i class="fas fa-bell"></i> Alerts</a></li>
+                <li><a href="logout"><i class="fas fa-sign-out-alt"></i> Logout</a></li>
+            </ul>
+        </aside>
+
+        <main class="main-content">
+            <header>
+                <h1>Analytical Overview</h1>
+                <button id="darkModeToggle">🌙</button>
+            </header>
+
+            <div class="stats">
+                <div class="card" style="grid-column: span 2;">
+                    <h3>Violation Trends (Last 7 Days)</h3>
+                    <canvas id="trendChart" height="120"></canvas>
+                </div>
+                <div class="card">
+                    <h3>Collection Distribution</h3>
+                    <canvas id="pieChart" height="200"></canvas>
+                </div>
+            </div>
+
+            <div class="stats">
+                <div class="card">
+                    <h3>Peak Hours</h3>
+                    <p class="value">09:00 - 11:00 AM</p>
+                </div>
+                <div class="card">
+                    <h3>Top Location</h3>
+                    <p class="value">Main Entrance</p>
+                </div>
+                <div class="card">
+                    <h3>Detection Accuracy</h3>
+                    <p class="value">98.4%</p>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        // Trend Chart
+        const ctx = document.getElementById('trendChart').getContext('2d');
+        new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+                datasets: [{
+                    label: 'Violations',
+                    data: [12, 19, 15, 8, 22, 13, 10],
+                    borderColor: '#38bdf8',
+                    tension: 0.4,
+                    fill: true,
+                    backgroundColor: 'rgba(56, 189, 248, 0.1)'
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: { legend: { display: false } },
+                scales: { y: { beginAtZero: true, grid: { color: '#334155' } }, x: { grid: { display: false } } }
+            }
+        });
+
+        // Pie Chart
+        const pieCtx = document.getElementById('pieChart').getContext('2d');
+        new Chart(pieCtx, {
+            type: 'doughnut',
+            data: {
+                labels: ['Paid', 'Pending', 'Void'],
+                datasets: [{
+                    data: [65, 25, 10],
+                    backgroundColor: ['#22c55e', '#eab308', '#ef4444'],
+                    borderWidth: 0
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: { legend: { position: 'bottom', labels: { color: '#94a3b8' } } }
+            }
+        });
+
+        const btn = document.getElementById('darkModeToggle');
+        btn.addEventListener('click', () => {
+            document.body.toggleAttribute('data-theme');
+            btn.innerText = document.body.hasAttribute('data-theme') ? '☀' : '🌙';
+        });
+    </script>
+</body>
+
+</html>

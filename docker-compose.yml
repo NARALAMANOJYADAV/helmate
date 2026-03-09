@@ -1,0 +1,18 @@
+version: '3.8'
+
+services:
+  helmate:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: helmate_ai_app
+    ports:
+      - "5001:5001"
+    volumes:
+      - ./database:/app/database
+      - ./uploads/captured_images:/app/uploads/captured_images
+    environment:
+      - PORT=5001
+      - PYTHONDONTWRITEBYTECODE=1
+      - PYTHONUNBUFFERED=1
+    restart: unless-stopped

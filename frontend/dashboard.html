@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Violations Archive - Helmet AI</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
+</head>
+
+<body>
+    <div class="dashboard">
+        <aside class="sidebar">
+            <h2><i class="fas fa-shield-alt"></i> Helmet AI</h2>
+            <ul>
+                <li><a href="dash-home.html"><i class="fas fa-video"></i> Live Camera</a></li>
+                <li><a href="dashboard.html" class="active"><i class="fas fa-exclamation-triangle"></i> Violations</a>
+                </li>
+                <li><a href="graph.html"><i class="fas fa-chart-line"></i> Statistics</a></li>
+                <li><a href="location.html"><i class="fas fa-map-marker-alt"></i> Locations</a></li>
+                <li><a href="messages.html"><i class="fas fa-bell"></i> Alerts</a></li>
+                <li><a href="logout"><i class="fas fa-sign-out-alt"></i> Logout</a></li>
+            </ul>
+        </aside>
+
+        <main class="main-content">
+            <header>
+                <div>
+                    <h1>Violations Archive</h1>
+                    <p style="color: var(--text-muted); font-size: 0.9rem;">Total Recorded Challans: <span
+                            id="totalChallansCount">...</span></p>
+                </div>
+                <div style="display: flex; gap: 15px;">
+                    <button class="card"
+                        style="padding: 10px 20px; font-size: 0.85rem; background: var(--secondary-bg); cursor: pointer; border: 1px solid rgba(255,255,255,0.05);"><i
+                            class="fas fa-file-export"></i> Export Report</button>
+                    <button id="darkModeToggle">🌙</button>
+                </div>
+            </header>
+
+            <section class="table-section">
+                <div
+                    style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; flex-wrap: wrap; gap: 15px;">
+                    <div style="position: relative; width: 300px;">
+                        <i class="fas fa-search"
+                            style="position: absolute; left: 15px; top: 50%; transform: translateY(-50%); color: var(--text-muted);"></i>
+                        <input type="text" placeholder="Search vehicle or timestamp..."
+                            style="padding: 12px 12px 12px 45px; border-radius: 12px; border: 1px solid var(--sidebar-bg); background: var(--primary-bg); color: var(--text-main); width: 100%; outline: none;">
+                    </div>
+                    <div style="display: flex; gap: 15px;">
+                        <select
+                            style="padding: 12px 20px; border-radius: 12px; border: 1px solid var(--sidebar-bg); background: var(--primary-bg); color: var(--text-main); cursor: pointer;">
+                            <option>Filter: Newest First</option>
+                            <option>Filter: Oldest First</option>
+                        </select>
+                    </div>
+                </div>
+
+                <table style="border-spacing: 0 8px; border-collapse: separate;">
+                    <thead>
+                        <tr style="background: transparent;">
+                            <th style="border:none;">Evidence</th>
+                            <th style="border:none;">Vehicle No</th>
+                            <th style="border:none;">Violation Time</th>
+                            <th style="border:none;">Status</th>
+                            <th style="border:none;">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody id="fullViolationsTable">
+                        <!-- Populated by JS -->
+                    </tbody>
+                </table>
+            </section>
+        </main>
+    </div>
+
+    <script src="sync.js"></script>
+    <script src="app.js"></script>
+    <script>
+        async function loadFullHistory() {
+            const response = await fetch(getApiUrl('/api/challans'));
+            const data = await response.json();
+
+            document.getElementById('totalChallansCount').innerText = data.length;
+
+            const tableBody = document.getElementById('fullViolationsTable');
+            tableBody.innerHTML = '';
+
+            data.forEach(challan => {
+                const row = `
+                <tr id="row-${challan.id}" style="background: var(--secondary-bg); box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);">
+                    <td style="border:none; padding: 20px; border-radius: 12px 0 0 12px;">
+                        <img src="${getApiUrl(challan.image_path)}" style="width: 100px; height: 60px; object-fit: cover; border-radius: 8px; cursor: pointer;" onclick="window.open(getApiUrl('${challan.image_path}'), '_blank')">
+                    </td>
+                    <td style="border:none; font-family: monospace; font-size: 1.1rem; font-weight: 700; color: var(--accent-color);">${challan.vehicle_no}</td>
+                    <td style="border:none; color: var(--text-muted);">${new Date(challan.timestamp).toLocaleString()}</td>
+                    <td style="border:none;"><span class="status-badge status-${challan.status.toLowerCase()}">${challan.status}</span></td>
+                    <td style="border:none; border-radius: 0 12px 12px 0;">
+                        <div style="display: flex; gap: 10px;">
+                            <button style="background: var(--sidebar-bg); border: none; color: white; padding: 8px 15px; border-radius: 8px; cursor: pointer;"><i class="fas fa-print"></i></button>
+                            <button onclick="deleteViolation(${challan.id})" style="background: #ef4444; border: none; color: white; padding: 8px 15px; border-radius: 8px; cursor: pointer;"><i class="fas fa-trash"></i></button>
+                        </div>
+                    </td>
+                </tr>
+            `;
+                tableBody.insertAdjacentHTML('beforeend', row);
+            });
+        }
+
+        async function deleteViolation(id) {
+            if (!confirm('Are you sure you want to delete this violation?')) return;
+
+            try {
+                const response = await fetch(getApiUrl(`/api/challans/delete/${id}`), { method: 'DELETE' });
+                if (response.ok) {
+                    document.getElementById(`row-${id}`).remove();
+                    const count = document.getElementById('totalChallansCount');
+                    count.innerText = parseInt(count.innerText) - 1;
+                } else {
+                    alert('Failed to delete violation');
+                }
+            } catch (err) {
+                console.error(err);
+                alert('Connection error');
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', loadFullHistory);
+
+        const btn = document.getElementById('darkModeToggle');
+        btn.addEventListener('click', () => {
+            document.body.toggleAttribute('data-theme');
+            btn.innerText = document.body.hasAttribute('data-theme') ? '☀' : '🌙';
+        });
+    </script>
+</body>
+
+</html>
