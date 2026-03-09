@@ -359,11 +359,11 @@ if __name__ == '__main__':
     try:
         print("\n[AI SYSTEM] Starting Helmet AI Server...")
         print(f" - Host: 0.0.0.0 (Global Access)")
-        print(f" - Port: 5001")
+        print(f" - Port: 10000")
         print(f" - Login ID: {ADMIN_USER}")
         print("-----------------------------------------")
         # RUN ON 0.0.0.0 to ensure both localhost and 127.0.0.1 work
-        port = int(os.environ.get("PORT", 5001))
+        port = int(os.environ.get("PORT", 10000))
         app.run(host='0.0.0.0', debug=False, port=port, threaded=True)
     except Exception as e:
         print(f"CRITICAL SERVER EXIT: {e}")

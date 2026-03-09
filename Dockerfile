@@ -4,7 +4,7 @@ FROM python:3.10-slim
 # Set environment variables for stable and predictable Python execution
 ENV PYTHONDONTWRITEBYTECODE=1
 ENV PYTHONUNBUFFERED=1
-ENV PORT=5001
+ENV PORT=10000
 ENV PIP_DEFAULT_TIMEOUT=1000
 ENV PIP_RETRIES=10
 
@@ -39,7 +39,7 @@ COPY . .
 RUN mkdir -p /app/database /app/uploads/captured_images
 
 # Open the port that the application runs on
-EXPOSE 5001
+EXPOSE 10000
 
 # Execute the main application server
 CMD ["python", "main.py"]
