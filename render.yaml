@@ -1,19 +1,13 @@
 services:
   - type: web
-    name: helmate-server
-    env: docker
+    name: ai-helmet-detector
+    env: python
     plan: free
-    region: ohio
-    branch: main
-    dockerFilePath: ./Dockerfile
+    region: singapore
+    buildCommand: pip install -r requirements.txt
+    startCommand: gunicorn wsgi:app
     envVars:
-      - key: PORT
-        value: "5001"
-      - key: PYTHONDONTWRITEBYTECODE
-        value: "1"
-      - key: PYTHONUNBUFFERED
-        value: "1"
-    disk:
-      name: database-disk
-      mountPath: /app/database
-      sizeGB: 1
+      - key: PYTHON_VERSION
+        value: "3.11.0"
+      - key: YOLO_CONFIG_DIR
+        value: "/tmp"
