@@ -94,27 +94,21 @@ class HelmetDetector:
                             if 1 in classes:
                                 return False # Network saw a naked head
                                 
-                # Face cascades check (Negative indicator: Seeing a face = No Helmet)
+                # ---- FALLBACK (Webcam Close-Up) ----
+                # Classic Face Detection cascade to catch these misses when directly in front of camera!
                 gray_upper = cv2.cvtColor(upper_roi, cv2.COLOR_BGR2GRAY)
-                # Frontal Face
                 fc = cv2.CascadeClassifier(cv2.data.haarcascades + 'haarcascade_frontalface_default.xml')
-                faces = fc.detectMultiScale(gray_upper, 1.1, 2) # Reduced minNeighbors for better sensitivity
-                
+                faces = fc.detectMultiScale(gray_upper, 1.1, 3)
+                if len(faces) == 0:
+                    pc = cv2.CascadeClassifier(cv2.data.haarcascades + 'haarcascade_profileface.xml')
+                    faces = pc.detectMultiScale(gray_upper, 1.1, 3)
+                    
                 if len(faces) > 0:
-                    cv2.putText(frame, "FACE", (x1, max(20, y1-15)), cv2.FONT_HERSHEY_PLAIN, 1.2, (0, 0, 255), 2)
-                    return False 
-
-                # Profile Face (Side view)
-                pc = cv2.CascadeClassifier(cv2.data.haarcascades + 'haarcascade_profileface.xml')
-                p_faces = pc.detectMultiScale(gray_upper, 1.1, 2)
-                if len(p_faces) > 0:
-                    cv2.putText(frame, "P-FACE", (x1, max(20, y1-15)), cv2.FONT_HERSHEY_PLAIN, 1.2, (0, 0, 255), 2)
-                    return False
-
-            # DEFAULT: If the AI didn't explicitly see a helmet (class 0) 
-            # and we couldn't confirm a face, we assume NO HELMET for safety.
-            # This fixes the "False Green Boxes" on bare heads.
-            return False
+                    cv2.putText(frame, "-FACE-", (x1, max(20, y1-15)), cv2.FONT_HERSHEY_PLAIN, 1.2, (0, 0, 255), 2)
+                    return False # We see a face, definitely no helmet
+                
+            # If no AI hit and no face found, default to True (assume helmeted on motorbike)
+            return True
             
         except Exception as e:
             print(f"AI Engine V6 error: {e}")
